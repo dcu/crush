@@ -15,6 +15,9 @@ const (
 	// TypeAgentError indicates the agent's turn terminated with an
 	// error. The error text is carried in Notification.Message.
 	TypeAgentError Type = "error"
+	// TypeGoalContinue indicates that a synthetic continuation turn
+	// is about to start.
+	TypeGoalContinue Type = "goal_continue"
 )
 
 // Notification represents a domain event published by the agent.

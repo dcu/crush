@@ -73,6 +73,7 @@ func NewCoordinator(
 		nil,   // questions
 		nil,   // history
 		nil,   // filetracker
+		nil,   // goalService
 		nil,   // lsp
 		nil,   // notifications
 		nil,   // run completions
