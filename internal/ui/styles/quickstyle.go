@@ -11,6 +11,7 @@ import (
 	"charm.land/glamour/v2/ansi"
 	"charm.land/lipgloss/v2"
 	"github.com/charmbracelet/crush/internal/ui/diffview"
+	uv "github.com/charmbracelet/ultraviolet"
 	"github.com/charmbracelet/x/exp/charmtone"
 )
 
@@ -691,6 +692,8 @@ func quickStyle(o quickStyleOpts) Styles {
 	// Buttons
 	s.Button.Focused = lipgloss.NewStyle().Foreground(o.onPrimary).Background(o.secondary)
 	s.Button.Blurred = lipgloss.NewStyle().Foreground(o.fgBase).Background(o.bgLessVisible)
+	s.Button.Hovered = lipgloss.NewStyle().Foreground(o.onPrimary).Background(o.fgMostSubtle)
+	s.Button.Negative = lipgloss.NewStyle().Foreground(o.onPrimary).Background(o.error)
 
 	// Editor
 	s.Editor.PromptNormalFocused = lipgloss.NewStyle().Foreground(o.successMostSubtle).SetString("::: ")
@@ -699,10 +702,52 @@ func quickStyle(o quickStyleOpts) Styles {
 	s.Editor.PromptYoloIconBlurred = s.Editor.PromptYoloIconFocused.Foreground(o.bgBase).Background(o.fgMoreSubtle)
 	s.Editor.PromptYoloDotsFocused = lipgloss.NewStyle().MarginRight(1).Foreground(o.warningSubtle).SetString(":::")
 	s.Editor.PromptYoloDotsBlurred = s.Editor.PromptYoloDotsFocused.Foreground(o.fgMoreSubtle)
+	s.Editor.PromptQuestionIconFocused = lipgloss.NewStyle().MarginRight(1).Foreground(o.fgBase).Background(o.primary).Bold(true).SetString(" ? ")
+	s.Editor.PromptQuestionIconBlurred = s.Editor.PromptQuestionIconFocused.Foreground(o.bgBase).Background(o.fgMoreSubtle)
+	s.Editor.QuestionSelected = lipgloss.NewStyle().Foreground(o.secondary).Bold(true)
+	s.Editor.QuestionUnselected = lipgloss.NewStyle().Foreground(o.fgBase)
+	s.Editor.QuestionBody = lipgloss.NewStyle().Foreground(o.fgMoreSubtle)
+	s.Editor.QuestionConfirm = lipgloss.NewStyle().Foreground(o.primary).Bold(true)
+	s.Editor.QuestionNote = lipgloss.NewStyle().Foreground(o.fgMostSubtle)
+	s.Editor.QuestionCursorBar = lipgloss.NewStyle().Foreground(o.secondary)
+	s.Editor.QuestionRadioOn = lipgloss.NewStyle().Foreground(o.secondary).SetString(RadioOn)
+	s.Editor.QuestionRadioOff = lipgloss.NewStyle().Foreground(o.fgSubtle).SetString(RadioOff)
+	s.Editor.QuestionCheckOn = lipgloss.NewStyle().Foreground(o.secondary).SetString(RadioOn)
+	s.Editor.QuestionCheckOff = lipgloss.NewStyle().Foreground(o.fgSubtle).SetString(RadioOff)
 
 	s.Radio.On = lipgloss.NewStyle().Foreground(o.fgSubtle).SetString(RadioOn)
 	s.Radio.Off = lipgloss.NewStyle().Foreground(o.fgSubtle).SetString(RadioOff)
 	s.Radio.Label = lipgloss.NewStyle().Foreground(o.fgSubtle)
+
+	// Tabs for batch question forms. All borders use charple
+	// (primary). Active tab has an open bottom that merges with
+	// the content area; inactive tabs have a closed bottom. First
+	// tab gets a right-angle bottom-left corner at draw time.
+	borderColor := uv.Style{Fg: o.primary}
+	inactiveBorder := uv.RoundedBorder().Style(borderColor)
+	inactiveBorder.BottomLeft = uv.Side{Content: "┴", Style: borderColor}
+	inactiveBorder.BottomRight = uv.Side{Content: "┴", Style: borderColor}
+	activeBorder := uv.RoundedBorder().Style(borderColor)
+	activeBorder.Bottom = uv.Side{Content: " ", Style: borderColor}
+	activeBorder.BottomLeft = uv.Side{Content: "┘", Style: borderColor}
+	activeBorder.BottomRight = uv.Side{Content: "└", Style: borderColor}
+
+	s.Tab.ActiveBorder = activeBorder
+	s.Tab.InactiveBorder = inactiveBorder
+
+	blurredBorderColor := uv.Style{Fg: o.fgMoreSubtle}
+	inactiveBorderBlurred := uv.RoundedBorder().Style(blurredBorderColor)
+	inactiveBorderBlurred.BottomLeft = uv.Side{Content: "┴", Style: blurredBorderColor}
+	inactiveBorderBlurred.BottomRight = uv.Side{Content: "┴", Style: blurredBorderColor}
+	activeBorderBlurred := uv.RoundedBorder().Style(blurredBorderColor)
+	activeBorderBlurred.Bottom = uv.Side{Content: " ", Style: blurredBorderColor}
+	activeBorderBlurred.BottomLeft = uv.Side{Content: "┘", Style: blurredBorderColor}
+	activeBorderBlurred.BottomRight = uv.Side{Content: "└", Style: blurredBorderColor}
+	s.Tab.ActiveBorderBlurred = activeBorderBlurred
+	s.Tab.InactiveBorderBlurred = inactiveBorderBlurred
+
+	s.Tab.ActiveStyle = uv.Style{Fg: o.fgBase}
+	s.Tab.InactiveStyle = uv.Style{Fg: o.fgMoreSubtle}
 
 	// Logo
 	s.Logo.FieldColor = o.primary
@@ -810,6 +855,9 @@ func quickStyle(o quickStyleOpts) Styles {
 	s.Messages.AssistantInfoDuration = subtle
 	s.Messages.AssistantCanceled = lipgloss.NewStyle().Foreground(o.fgBase).Italic(true)
 
+	// Plan section styles
+	s.Messages.PlanBox = lipgloss.NewStyle().Foreground(o.fgBase).Background(o.bgLeastVisible).Padding(1, 2)
+
 	// Thinking section styles
 	s.Messages.ThinkingBox = subtle.Background(o.bgLeastVisible)
 	s.Messages.ThinkingTruncationHint = muted
@@ -907,6 +955,7 @@ func quickStyle(o quickStyleOpts) Styles {
 	s.Dialog.Sessions.InfoFocused = lipgloss.NewStyle().Foreground(o.fgBase)
 
 	s.Status.Help = lipgloss.NewStyle().Padding(0, 1)
+	s.Status.PlanBadge = lipgloss.NewStyle().Foreground(o.onPrimary).Background(o.primary).Padding(0, 1).Bold(true)
 	s.Status.SuccessIndicator = base.Foreground(o.bgLessVisible).Background(o.success).Padding(0, 1).Bold(true).SetString("OKAY!")
 	s.Status.InfoIndicator = s.Status.SuccessIndicator
 	s.Status.UpdateIndicator = s.Status.SuccessIndicator.SetString("HEY!")
