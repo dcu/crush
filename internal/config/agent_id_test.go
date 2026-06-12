@@ -32,4 +32,10 @@ func TestConfig_AgentIDs(t *testing.T) {
 		require.True(t, ok)
 		assert.Equal(t, AgentPlan, planAgent.ID, "Plan agent ID should be '%s'", AgentPlan)
 	})
+
+	t.Run("Explore agent should have correct ID", func(t *testing.T) {
+		exploreAgent, ok := cfg.Agents[AgentExplore]
+		require.True(t, ok)
+		assert.Equal(t, AgentExplore, exploreAgent.ID, "Explore agent ID should be '%s'", AgentExplore)
+	})
 }
